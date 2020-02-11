@@ -14,7 +14,7 @@
 Route::group([ 'middleware' => ['web'] ], function() {
 
         Route::get('/{author?}', [
-            'uses' => 'QUoteController@getIndex',
+            'uses' => 'QuoteController@getIndex',
             'as' => 'index'
         ]);
 
@@ -26,6 +26,11 @@ Route::group([ 'middleware' => ['web'] ], function() {
         Route::get('/delete/{quote_id}', [
             'uses' => 'QuoteController@getDeleteQuote',
             'as' => 'delete'
+        ]);
+
+        Route::get('/gotemail/{author_name}', [
+            'uses' => 'QuoteController@gotMailCallback',
+            'as' => 'mail_callback'
         ]);
 });
 

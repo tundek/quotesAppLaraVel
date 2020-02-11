@@ -4,7 +4,7 @@
     Trending Quotes
 @endsection
 
-@section('styles')
+@section('stylesheets')
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 @endsection
 
@@ -40,7 +40,13 @@
             </article>
         @endfor
         <div class="pagination"> 
-            Pagination
+            @if($quotes->currentPage() !== 1)
+                <a href="{{ $quotes->previousPageURL() }}"> <span class="fa fa-caret-left"></span></a>
+            @endif
+
+            @if($quotes->currentPage() !== $quotes->lastPage() && $quotes->hasPages())
+                <a href="{{ $quotes->nextPageURL() }}"><span class="fa fa-caret-right"></span></a>
+            @endif
         </div>
         
     </section>
@@ -52,6 +58,11 @@
             <div class="input-group">
                 <label for="author">Your name</label>
                 <input type="text" name="author" id="author" placeholder="Enter your name">
+            </div>
+
+            <div class="input-group">
+                <label for="email">Your E-Mail</label>
+                <input type="text" name="email" id="email" placeholder="Enter your E-Mail">
             </div>
 
             <div class="input-group">

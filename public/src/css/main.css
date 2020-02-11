@@ -99,6 +99,10 @@ body {
     width: 200px;
 }
 
+.input-group #email {
+    width: 200px;
+}
+
 .input-group textarea {
     width: 400px;
 }

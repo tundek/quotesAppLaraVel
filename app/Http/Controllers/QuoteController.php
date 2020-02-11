@@ -5,18 +5,21 @@ namespace App\Http\Controllers;
 use App\Author;
 use App\Quote;
 use Illuminate\Http\Request;
+use App\Events\QuoteCreated;
+use Illuminate\Support\Facades\Event;
+use App\AuthorLog;
 
-class QUoteController extends Controller {
+class QuoteController extends Controller {
 
     public function getIndex($author = null) {
         if(!is_null($author)) {
             $quote_author = Author::where('name', $author)->first();
             if($quote_author) {
-                $quotes = $quote_author->quotes()->orderBy('created_at', 'desc')->get();
+                $quotes = $quote_author->quotes()->orderBy('created_at', 'desc')->paginate(3);
             }
 
         }else {
-            $quotes = Quote::orderBy('created_at', 'desc')->get();
+            $quotes = Quote::orderBy('created_at', 'desc')->paginate(3);
         }
 
         return view('index', ['quotes' => $quotes]);
@@ -27,7 +30,8 @@ class QUoteController extends Controller {
 
         $this->validate($request, [
             'author' => 'required | max:60 | alpha',
-            'quote' => 'required |'
+            'quote' => 'required | max:500',
+            'email' => 'required | email'
         ]);
 
         $quoteText = $request['quote'];
@@ -38,12 +42,15 @@ class QUoteController extends Controller {
         if(!$author) {
             $author = new Author();
             $author->name = $authorText;
+            $author->email = $request['email'];
             $author->save();
         }
 
         $quote = new Quote();
         $quote->quote = $quoteText;
         $author->quotes()->save($quote);
+
+        Event::fire(new QuoteCreated($author));
 
         return redirect()->route('index')->with([
             'success' => "Quote successfully saved!!"
@@ -64,6 +71,15 @@ class QUoteController extends Controller {
 
         $msg = $author_deleted ? 'Quote and Author successfully deleted' : 'Quote successfully deleted';  
         return redirect()->route('index')->with(['success' => $msg]);
+    }
+
+    public function gotMailCallback($author_name) {
+
+        $author_log = new AuthorLog();
+        $author_log->author = $author_name;
+        $author_log->save();
+
+        return view('mail.callback', ['author' => $author_name] );
     }
 
 }
